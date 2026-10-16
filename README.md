@@ -17,7 +17,7 @@ Open `dist/` via any static host or `npm run preview` (opening index.html straig
 
 ## Deploying (Cloudflare)
 
-`npm run deploy` builds and publishes to https://saved-posts-explorer.evanhaacke.workers.dev. Hugging Face blocks browser requests from `*.workers.dev`, so the deployed site loads the search model through a small relay in `worker/index.js` (`/hf/...`, limited to the bge-small model). Local dev talks to Hugging Face directly.
+`npm run deploy` builds and publishes to https://saved-posts-explorer.evanhaacke.workers.dev. Hugging Face blocks browser requests from `*.workers.dev`, so the deployed site loads the search model through a small relay in `worker/index.js` (`/hf/...`, limited to the bge-small model). `npm run dev` / `npm run preview` provide the same `/hf/` path through Vite's proxy.
 
 ## Refreshing the data
 

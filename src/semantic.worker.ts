@@ -4,9 +4,9 @@ import { pipeline, env } from '@xenova/transformers';
 import { embedQuery, MODEL } from './lib/semantic';
 
 env.allowLocalModels = false;
-// Hugging Face blocks browser requests from *.workers.dev, so the deployed site
-// fetches the model through its own /hf/ relay (worker/index.js).
-if (!['localhost', '127.0.0.1'].includes(self.location.hostname)) env.remoteHost = `${self.location.origin}/hf/`;
+// Hugging Face blocks browser requests from *.workers.dev, so the model always comes
+// through this site's own /hf/ relay (worker/index.js deployed, vite.config.ts locally).
+env.remoteHost = `${self.location.origin}/hf/`;
 
 let extractor: any = null;
 const post = (m: unknown) => (self as unknown as Worker).postMessage(m);
