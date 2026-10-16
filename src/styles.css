@@ -76,6 +76,11 @@ a { color: var(--accent); }
 .status.loading i { background: #f59e0b; animation: pulse 1s ease-in-out infinite; }
 .status.error i { background: #ef4444; }
 @keyframes pulse { 50% { opacity: 0.3; } }
+.sem { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 26px; }
+.btn.sm.dl { margin-left: 0; white-space: nowrap; animation: pop 0.4s var(--spring) both; }
+.dl-bar { display: block; width: 120px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; animation: pop 0.4s var(--spring) both; }
+.dl-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: left; transition: transform 0.35s var(--spring); }
+@keyframes pop { from { opacity: 0; transform: scale(0.92); } }
 @media (min-width: 820px) {
   .top-inner { grid-template-columns: auto auto 1fr; align-items: center; gap: 16px; }
   .search { flex-direction: row; align-items: center; gap: 12px; }
@@ -188,7 +193,7 @@ button.chip.on { background: hsl(var(--h) 65% 45%); border-color: transparent; c
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.15s !important; }
-  .card, .tip-section, .surprise { animation: fade 0.15s linear both !important; }
+  .card, .tip-section, .surprise, .dl, .dl-bar { animation: fade 0.15s linear both !important; }
   .chev, .card:hover { transform: none !important; }
 }
 @keyframes fade { from { opacity: 0; } }

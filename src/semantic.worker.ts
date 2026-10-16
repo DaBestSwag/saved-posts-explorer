@@ -15,7 +15,12 @@ self.onmessage = async (e: MessageEvent) => {
   const m = e.data;
   try {
     if (m.type === 'init') {
-      extractor = await pipeline('feature-extraction', MODEL, { quantized: true });
+      extractor = await pipeline('feature-extraction', MODEL, {
+        quantized: true,
+        progress_callback: (p: any) => {
+          if (p.status === 'progress') post({ type: 'progress', file: p.file, loaded: p.loaded, total: p.total });
+        },
+      });
       post({ type: 'ready' });
     } else if (m.type === 'embed' && extractor) {
       const vec = await embedQuery(extractor, m.text);

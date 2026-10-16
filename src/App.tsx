@@ -60,6 +60,7 @@ export default function App() {
   const embRef = useRef<Float32Array | null>(null);
   const [status, setStatus] = useState<SemStatus>('idle');
   const [vec, setVec] = useState<{ text: string; v: Float32Array } | null>(null);
+  const [progress, setProgress] = useState(0); // 0..1 of the model file
 
   const startSemantic = () => {
     if (workerRef.current || !data) return;
@@ -68,7 +69,11 @@ export default function App() {
     workerRef.current = w;
     w.onmessage = (e) => {
       const m = e.data;
-      if (m.type === 'ready') {
+      // Track only the 32 MB .onnx file: the small config/tokenizer files finish first
+      // and would make a combined percentage jump to 100% and back.
+      if (m.type === 'progress') {
+        if (m.file.endsWith('.onnx') && m.total) setProgress(m.loaded / m.total);
+      } else if (m.type === 'ready') {
         fetch(`${BASE}data/embeddings.bin`)
           .then((r) => r.arrayBuffer())
           .then((buf) => {
@@ -81,6 +86,12 @@ export default function App() {
     };
     w.onerror = () => setStatus('error');
     w.postMessage({ type: 'init' });
+  };
+  const retrySemantic = () => {
+    workerRef.current?.terminate();
+    workerRef.current = null;
+    setProgress(0);
+    startSemantic();
   };
   useEffect(() => () => workerRef.current?.terminate(), []);
 
@@ -154,7 +165,7 @@ export default function App() {
   };
 
   const statusLabel =
-    status === 'ready' ? 'Semantic search ready' : status === 'loading' ? 'Loading semantic model…' : status === 'error' ? 'Keyword search (semantic model unavailable)' : 'Keyword search';
+    status === 'ready' ? 'Semantic search ready' : status === 'loading' ? `Downloading search model… ${Math.round(progress * 100)}%` : status === 'error' ? 'Keyword search (semantic model unavailable)' : 'Keyword search';
 
   return (
     <>
@@ -178,9 +189,26 @@ export default function App() {
                 onChange={(e) => onInput(e.target.value)}
                 aria-label="Search posts"
               />
-              <span className={`status ${status}`} title={statusLabel}>
-                <i /> {statusLabel}
-              </span>
+              <div className="sem">
+                <span className={`status ${status}`} title={statusLabel}>
+                  <i /> {statusLabel}
+                </span>
+                {status === 'idle' && (
+                  <button className="btn sm dl" onClick={startSemantic} disabled={!data}>
+                    Download search model · 32 MB
+                  </button>
+                )}
+                {status === 'loading' && (
+                  <span className="dl-bar" role="progressbar" aria-label="Search model download" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress * 100)}>
+                    <span style={{ transform: `scaleX(${progress})` }} />
+                  </span>
+                )}
+                {status === 'error' && (
+                  <button className="btn sm dl" onClick={retrySemantic}>
+                    Retry
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>
