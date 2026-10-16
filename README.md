@@ -15,6 +15,10 @@ npm run check:semantic   # runs the real embedding model in Node (needs internet
 
 Open `dist/` via any static host or `npm run preview` (opening index.html straight from disk will not work because the app fetches its data files).
 
+## Deploying (Cloudflare)
+
+`npm run deploy` builds and publishes to https://saved-posts-explorer.evanhaacke.workers.dev. Hugging Face blocks browser requests from `*.workers.dev`, so the deployed site loads the search model through a small relay in `worker/index.js` (`/hf/...`, limited to the bge-small model). Local dev talks to Hugging Face directly.
+
 ## Refreshing the data
 
 1. Replace the files in `data/` (keep the names): `categorized_saved_posts_full.csv`, `embeddings.csv`, `agentic_tips.md`.

@@ -3,3 +3,4 @@ dist/
 # generated from data/ by scripts/build-data.mjs on every dev/build
 public/data/
 *.log
+.wrangler/

@@ -10,6 +10,7 @@
     "prebuild": "node scripts/build-data.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && wrangler deploy",
     "check": "node scripts/check.mjs",
     "check:semantic": "tsx scripts/check-semantic.mts"
   },
@@ -26,6 +27,7 @@
     "@vitejs/plugin-react": "^6.1.2",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.4",
+    "wrangler": "^4.151.1"
   }
 }
