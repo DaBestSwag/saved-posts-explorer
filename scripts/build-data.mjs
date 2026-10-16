@@ -22,6 +22,18 @@ const int = (s) => {
   return Number.isFinite(n) ? n : 0;
 };
 
+// Hand-curated extra subcategories (id -> names); optional, "_parents" is metadata and skipped.
+const extraFile = path.join(dataDir, 'extra_subcategories.json');
+const extra = fs.existsSync(extraFile) ? JSON.parse(fs.readFileSync(extraFile, 'utf8')) : {};
+
+// Hand-curated category fixes (id -> full category list); optional.
+const overrideFile = path.join(dataDir, 'category_overrides.json');
+const overrides = fs.existsSync(overrideFile) ? JSON.parse(fs.readFileSync(overrideFile, 'utf8')) : {};
+// Subcategory -> parent categories; a subcategory is dropped when its post no longer has any parent.
+const parentsOf = {};
+for (const [parent, subs] of Object.entries({ ...(extra._parents || {}), Filmmaking: ['Music videos', 'Cinematography', 'Lighting', 'Color grading', 'Editing'] }))
+  for (const s of subs) (parentsOf[s] ||= []).push(parent);
+
 const rows = parseCsv('categorized_saved_posts_full.csv');
 const posts = rows.map((r) => ({
   id: r.media_id,
@@ -29,7 +41,7 @@ const posts = rows.map((r) => ({
   author: r.author || '',
   authorName: r.author_name || '',
   categories: split(r.categories),
-  subcategories: split(r.subcategories),
+  subcategories: [...new Set([...split(r.subcategories), ...(r.media_id === '_parents' ? [] : extra[r.media_id] || [])])],
   published: r.published || '',
   mediaType: r.media_type || '',
   postType: r.post_type || '',
@@ -39,6 +51,10 @@ const posts = rows.map((r) => ({
   hashtags: r.hashtags || '',
   desc: r.media_description || '',
 }));
+for (const p of posts) {
+  if (overrides[p.id]) p.categories = overrides[p.id];
+  p.subcategories = p.subcategories.filter((s) => !parentsOf[s] || parentsOf[s].some((c) => p.categories.includes(c)));
+}
 
 const emb = parseCsv('embeddings.csv');
 const dims = Object.keys(emb[0]).filter((k) => k.startsWith('dim_')).length;

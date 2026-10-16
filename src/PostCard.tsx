@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Post } from './lib/types';
 import { catHue } from './lib/cats';
 
@@ -13,6 +13,28 @@ function fmtDate(s: string) {
 export function PostCard({ post: p, index = 0 }: { post: Post; index?: number }) {
   const [open, setOpen] = useState(false);
   const long = p.caption.length > 200 || p.caption.split('\n').length > 3;
+
+  // Instagram's player loads only on tap: 60 live embeds at once would stall a phone.
+  const embedUrl = /^https:\/\/www\.instagram\.com\/(p|reel|tv)\/[\w-]+\/?/.exec(p.url)?.[0].replace(/\/?$/, '/embed/');
+  const [embed, setEmbed] = useState(false);
+  const [height, setHeight] = useState(0);
+  const frame = useRef<HTMLIFrameElement>(null);
+  useEffect(() => {
+    if (!embed) return;
+    // The embed reports its content height so the card can fit it without a scrollbar.
+    const onMsg = (e: MessageEvent) => {
+      if (e.origin !== 'https://www.instagram.com' || e.source !== frame.current?.contentWindow) return;
+      try {
+        const m = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+        if (m?.type === 'MEASURE' && m.details?.height > 0) setHeight(m.details.height);
+      } catch {
+        /* not a message we understand */
+      }
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [embed]);
+
   return (
     <article className="card" style={{ '--i': Math.min(index, 12) } as React.CSSProperties}>
       <header className="card-head">
@@ -37,6 +59,19 @@ export function PostCard({ post: p, index = 0 }: { post: Post; index?: number })
           )}
         </div>
       )}
+      {embedUrl &&
+        (embed ? (
+          <div className="embed-wrap">
+            <div className="embed" style={height ? { height } : undefined}>
+              <iframe ref={frame} src={embedUrl} title={`Instagram post by @${p.author}`} allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" allowFullScreen />
+            </div>
+            <button className="link" onClick={() => setEmbed(false)}>Hide player</button>
+          </div>
+        ) : (
+          <button className="btn watch" onClick={() => setEmbed(true)}>
+            ▶ {p.mediaType === 'VIDEO' ? 'Watch here' : 'View here'}
+          </button>
+        ))}
       {p.desc && (
         <details className="desc">
           <summary>In the video</summary>
@@ -48,7 +83,7 @@ export function PostCard({ post: p, index = 0 }: { post: Post; index?: number })
           <span key={c} className="chip static" style={{ '--h': catHue(c) } as React.CSSProperties}>{c}</span>
         ))}
         {p.subcategories.map((c) => (
-          <span key={c} className="chip static sub" style={{ '--h': 215 } as React.CSSProperties}>{c}</span>
+          <span key={c} className="chip static sub" style={{ '--h': catHue(c) } as React.CSSProperties}>{c}</span>
         ))}
       </div>
       {p.url && (

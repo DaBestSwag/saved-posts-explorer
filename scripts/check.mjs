@@ -22,8 +22,8 @@ const tally = (key) => {
 const same = (got, want) => Object.keys(want).every((k) => got[k] === want[k]) && Object.keys(got).length === Object.keys(want).length;
 
 ok('posts count 1668', posts.length === 1668, String(posts.length));
-const wantCats = { Politics: 463, Other: 389, Filmmaking: 352, Basketball: 125, 'Agentic coding': 115, 'Movies and TV': 62, Music: 58, Memes: 54, 'Going out': 52, Gaming: 47, Cooking: 40, 'Food out': 34, Workout: 26, 'Other sports': 20, Massage: 11, Science: 10 };
-const wantSubs = { 'Music videos': 76, Cinematography: 22, Lighting: 19, 'Color grading': 12, Editing: 8 };
+const wantCats = { Politics: 463, Other: 395, Filmmaking: 354, Basketball: 125, 'Agentic coding': 114, 'Movies and TV': 62, Music: 60, Memes: 53, 'Going out': 26, Gaming: 47, Cooking: 29, 'Food out': 34, Workout: 26, 'Other sports': 20, Massage: 11, Science: 10 };
+const wantSubs = { 'Music videos': 76, Cinematography: 22, Lighting: 19, 'Color grading': 12, Editing: 8, American: 10, Asian: 7, Italian: 3, Mexican: 3, 'Baking & desserts': 2, 'Daytime activities': 12, Bars: 9, Clubs: 5 };
 const cats = tally('categories');
 const subs = tally('subcategories');
 ok('category counts', same(cats, wantCats), JSON.stringify(cats));

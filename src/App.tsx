@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Post, PostsFile } from './lib/types';
 import { buildKeywordIndex, rankByScore } from './lib/keyword';
 import { parseQuery, rankHybrid } from './lib/semantic';
-import { CATEGORIES, SUBS, catHue } from './lib/cats';
+import { CATEGORIES, SUB_PARENTS, catHue } from './lib/cats';
 import { useStored } from './useStored';
 import { PostCard } from './PostCard';
 import { TipsTab } from './TipsTab';
+import { Sheet } from './Sheet';
+import { useLayout } from './useLayout';
 
 const BASE = import.meta.env.BASE_URL;
 const PAGE = 60;
@@ -33,6 +35,12 @@ export default function App() {
   const [query, setQuery] = useState(''); // debounced
   const [shown, setShown] = useState(PAGE);
   const [surprise, setSurprise] = useState<Post | null>(null);
+  const layout = useLayout();
+  const [sheet, setSheet] = useState(false); // phone filter sheet
+  const closeSheet = useCallback(() => setSheet(false), []);
+  useEffect(() => {
+    if (layout !== 'phone') setSheet(false);
+  }, [layout]);
 
   // --- data
   useEffect(() => {
@@ -116,10 +124,14 @@ export default function App() {
 
   // --- filtering + ranking
   const passes = useMemo(() => {
-    return (p: Post) =>
-      (!cats.length || p.categories.some((c) => cats.includes(c))) &&
-      (!subs.length || p.subcategories.some((c) => subs.includes(c))) &&
-      (type === 'ALL' || p.mediaType === type);
+    // A post matches a picked category; if subcategories of that category are picked too,
+    // it must also have one of them. Other picked categories are unaffected.
+    const inCat = (p: Post, c: string) => {
+      if (!p.categories.includes(c)) return false;
+      const picked = (SUB_PARENTS[c] ?? []).filter((s) => subs.includes(s));
+      return !picked.length || p.subcategories.some((s) => picked.includes(s));
+    };
+    return (p: Post) => (!cats.length || cats.some((c) => inCat(p, c))) && (type === 'ALL' || p.mediaType === type);
   }, [cats, subs, type]);
 
   const semanticLive = status === 'ready' && !!searchText && vec?.text === searchText && !!embRef.current;
@@ -149,16 +161,25 @@ export default function App() {
 
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-  const clearAll = () => {
+  // Un-picking a category also drops its subcategories, which are hidden with it.
+  const toggleCat = (c: string) => {
+    if (cats.includes(c)) setSubs(subs.filter((s) => !SUB_PARENTS[c]?.includes(s)));
+    toggle(cats, setCats, c);
+  };
+  const clearFilters = () => {
     setCats([]);
     setSubs([]);
     setType('ALL');
+  };
+  const clearAll = () => {
+    clearFilters();
     setSort('best');
     setInput('');
     setQuery('');
     setSurprise(null);
   };
-  const dirty = cats.length || subs.length || type !== 'ALL' || input || sort !== 'best';
+  const active = cats.length + subs.length + (type !== 'ALL' ? 1 : 0);
+  const dirty = active || input || sort !== 'best';
   const doSurprise = () => {
     const pool = data ? (results.length ? results : []) : [];
     if (pool.length) setSurprise(pool[Math.floor(Math.random() * pool.length)]);
@@ -195,7 +216,7 @@ export default function App() {
                 </span>
                 {status === 'idle' && (
                   <button className="btn sm dl" onClick={startSemantic} disabled={!data}>
-                    Download search model · 32 MB
+                    Download <span className="not-phone">search </span>model · 32 MB
                   </button>
                 )}
                 {status === 'loading' && (
@@ -214,7 +235,7 @@ export default function App() {
         </div>
       </header>
 
-      <main>
+      <main className={tab === 'explore' ? layout : ''}>
         {tab === 'tips' ? (
           <TipsTab />
         ) : loadError ? (
@@ -222,48 +243,54 @@ export default function App() {
         ) : !data ? (
           <p className="empty">Loading…</p>
         ) : (
-          <>
-            <section className="panel">
-              <button className="panel-head" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}>
-                <span>Filters{cats.length + subs.length + (type !== 'ALL' ? 1 : 0) ? ` · ${cats.length + subs.length + (type !== 'ALL' ? 1 : 0)} active` : ''}</span>
-                <span className={`chev ${filtersOpen ? 'open' : ''}`} aria-hidden>▾</span>
+          (() => {
+            const catChip = (c: string) => (
+              <button key={c} className={`chip ${cats.includes(c) ? 'on' : ''}`} style={{ '--h': catHue(c) } as React.CSSProperties} aria-pressed={cats.includes(c)} onClick={() => toggleCat(c)}>
+                {c} <b>{catCounts.get(c) ?? 0}</b>
               </button>
-              <div className={`collapse ${filtersOpen ? 'open' : ''}`}>
-                <div className="collapse-inner">
-                  <div className="group-label">Categories</div>
-                  <div className="chips">
-                    {CATEGORIES.map((c) => (
-                      <button key={c} className={`chip ${cats.includes(c) ? 'on' : ''}`} style={{ '--h': catHue(c) } as React.CSSProperties} aria-pressed={cats.includes(c)} onClick={() => toggle(cats, setCats, c)}>
-                        {c} <b>{catCounts.get(c) ?? 0}</b>
-                      </button>
-                    ))}
+            );
+            const subChip = (c: string) => (
+              <button key={c} className={`chip ${subs.includes(c) ? 'on' : ''}`} style={{ '--h': catHue(c) } as React.CSSProperties} aria-pressed={subs.includes(c)} onClick={() => toggle(subs, setSubs, c)}>
+                {c} <b>{subCounts.get(c) ?? 0}</b>
+              </button>
+            );
+            // Picked categories that have subcategories, in category order.
+            const subGroups = CATEGORIES.filter((c) => cats.includes(c) && SUB_PARENTS[c]?.length);
+            // One set of filter controls, placed per device: sidebar (desktop), folding panel (iPad), sheet (phone).
+            const filterBody = (
+              <>
+                <div className="group-label">Categories</div>
+                <div className="chips">{CATEGORIES.map(catChip)}</div>
+                {subGroups.map((parent) => (
+                  <div key={parent} className="sub-group">
+                    <div className="group-label">{parent} types</div>
+                    <div className="chips">{SUB_PARENTS[parent].map(subChip)}</div>
                   </div>
-                  <div className="group-label">Subcategories</div>
-                  <div className="chips">
-                    {SUBS.map((c) => (
-                      <button key={c} className={`chip ${subs.includes(c) ? 'on' : ''}`} style={{ '--h': 215 } as React.CSSProperties} aria-pressed={subs.includes(c)} onClick={() => toggle(subs, setSubs, c)}>
-                        {c} <b>{subCounts.get(c) ?? 0}</b>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="group-label">Media type</div>
-                  <div className="seg" role="group" aria-label="Media type">
-                    {TYPES.map((t) => (
-                      <button key={t.v} className={type === t.v ? 'on' : ''} aria-pressed={type === t.v} onClick={() => setType(t.v)}>
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
+                ))}
+                <div className="group-label">Media type</div>
+                <div className="seg" role="group" aria-label="Media type">
+                  {TYPES.map((t) => (
+                    <button key={t.v} className={type === t.v ? 'on' : ''} aria-pressed={type === t.v} onClick={() => setType(t.v)}>
+                      {t.label}
+                    </button>
+                  ))}
                 </div>
-              </div>
-            </section>
-
+              </>
+            );
+            const filtersLabel = `Filters${active ? ` · ${active} active` : ''}`;
+            const feed = (
+              <>
             <div className="toolbar">
               <div className="count" aria-live="polite">
                 Showing {num.format(Math.min(shown, results.length))} of {num.format(data.posts.length)}
                 {results.length !== data.posts.length && <span className="muted"> · {num.format(results.length)} match</span>}
               </div>
               <div className="tools">
+                {layout === 'phone' && (
+                  <button className={`btn filt ${active ? 'has' : ''}`} onClick={() => setSheet(true)} aria-haspopup="dialog">
+                    Filters{active ? ` · ${active}` : ''}
+                  </button>
+                )}
                 <label className="sort">
                   <span className="sr">Sort</span>
                   <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
@@ -309,7 +336,62 @@ export default function App() {
                 )}
               </>
             )}
-          </>
+              </>
+            );
+
+            if (layout === 'desktop')
+              return (
+                <div className="layout">
+                  <aside className="side" aria-label="Filters">
+                    <div className="side-head">
+                      <span>{filtersLabel}</span>
+                      <button className="btn ghost sm" onClick={clearFilters} disabled={!active}>Reset</button>
+                    </div>
+                    {filterBody}
+                  </aside>
+                  <div className="content">{feed}</div>
+                </div>
+              );
+            if (layout === 'phone')
+              return (
+                <>
+                  <div className="quick" role="group" aria-label="Categories">{CATEGORIES.map(catChip)}</div>
+                  {subGroups.length > 0 && (
+                    <div className="quick sub-row" role="group" aria-label="Subcategories">
+                      {subGroups.flatMap((p) => SUB_PARENTS[p]).map(subChip)}
+                    </div>
+                  )}
+                  {feed}
+                  <Sheet
+                    open={sheet}
+                    onClose={closeSheet}
+                    title={filtersLabel}
+                    footer={
+                      <div className="sheet-actions">
+                        <button className="btn ghost" onClick={clearFilters} disabled={!active}>Reset</button>
+                        <button className="btn big" onClick={closeSheet}>Show {num.format(results.length)} posts</button>
+                      </div>
+                    }
+                  >
+                    {filterBody}
+                  </Sheet>
+                </>
+              );
+            return (
+              <>
+                <section className="panel">
+                  <button className="panel-head" aria-expanded={filtersOpen} onClick={() => setFiltersOpen(!filtersOpen)}>
+                    <span>{filtersLabel}</span>
+                    <span className={`chev ${filtersOpen ? 'open' : ''}`} aria-hidden>▾</span>
+                  </button>
+                  <div className={`collapse ${filtersOpen ? 'open' : ''}`}>
+                    <div className="collapse-inner">{filterBody}</div>
+                  </div>
+                </section>
+                {feed}
+              </>
+            );
+          })()
         )}
       </main>
     </>

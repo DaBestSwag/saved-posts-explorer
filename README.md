@@ -23,7 +23,9 @@ Open `dist/` via any static host or `npm run preview` (opening index.html straig
 
 1. Replace the files in `data/` (keep the names): `categorized_saved_posts_full.csv`, `embeddings.csv`, `agentic_tips.md`.
 2. Run `npm run build` (or restart `npm run dev`). `scripts/build-data.mjs` runs automatically and regenerates `public/data/posts.json`, `embeddings.bin` and the tips file. Raw CSVs are never shipped.
-3. `embeddings.csv` rows are matched to posts by `media_id`; they must be bge-small-en-v1.5 vectors (CLS pooling, normalized) or semantic search quality will drop.
+3. New CSV rows in Cooking / Going out won't get cuisine or Daytime activities / Bars / Clubs subcategories until `data/extra_subcategories.json` (post id -> subcategory names) is updated; `scripts/build-data.mjs` merges it in.
+4. `data/category_overrides.json` (post id -> full category list) replaces the CSV categories for hand-fixed posts; new CSV rows aren't affected, and subcategories whose parent category was removed are dropped.
+5. `embeddings.csv` rows are matched to posts by `media_id`; they must be bge-small-en-v1.5 vectors (CLS pooling, normalized) or semantic search quality will drop.
 
 ## How search works
 
