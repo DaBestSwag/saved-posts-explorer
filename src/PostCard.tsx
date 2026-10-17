@@ -78,6 +78,12 @@ export function PostCard({ post: p, index = 0 }: { post: Post; index?: number })
           <p>{p.desc}</p>
         </details>
       )}
+      {(p.transcript || p.imageText) && (
+        <details className="desc">
+          <summary>{p.transcript ? 'Transcript' : 'Text in image'}</summary>
+          <p>{p.transcript || p.imageText}</p>
+        </details>
+      )}
       <div className="chips tight">
         {p.categories.map((c) => (
           <span key={c} className="chip static" style={{ '--h': catHue(c) } as React.CSSProperties}>{c}</span>

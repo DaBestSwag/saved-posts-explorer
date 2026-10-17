@@ -50,6 +50,8 @@ const posts = rows.map((r) => ({
   caption: r.caption || '',
   hashtags: r.hashtags || '',
   desc: r.media_description || '',
+  transcript: r.transcript || '',
+  imageText: r.image_text || '',
 }));
 for (const p of posts) {
   if (overrides[p.id]) p.categories = overrides[p.id];

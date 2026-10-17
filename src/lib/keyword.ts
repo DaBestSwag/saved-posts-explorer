@@ -11,7 +11,7 @@ const STOP = new Set(
     .filter(Boolean),
 );
 
-const FIELD_W = { author: 3, hashtags: 2, caption: 2, desc: 1 } as const;
+const FIELD_W = { author: 3, hashtags: 2, caption: 2, desc: 1, transcript: 1, imageText: 1 } as const;
 type Field = keyof typeof FIELD_W;
 
 /** Lowercase, split on non-letters/digits, light plural stemming. Keeps stopwords out only if `dropStop`. */
@@ -37,7 +37,7 @@ interface Doc {
   tf: Map<string, number>[]; // one per field, same order as FIELDS
   phrase: string; // normalized full text for phrase match
 }
-const FIELDS: Field[] = ['author', 'hashtags', 'caption', 'desc'];
+const FIELDS: Field[] = ['author', 'hashtags', 'caption', 'desc', 'transcript', 'imageText'];
 
 export interface KeywordIndex {
   /** Score for every post (0 = no match). Aligned with the posts array given to buildKeywordIndex. */
@@ -57,7 +57,7 @@ export function buildKeywordIndex(posts: Post[]): KeywordIndex {
       return m;
     });
     for (const t of seen) df.set(t, (df.get(t) ?? 0) + 1);
-    return { tf, phrase: norm(`${p.author} ${p.caption} ${p.hashtags} ${p.desc}`) };
+    return { tf, phrase: norm(`${p.author} ${p.caption} ${p.hashtags} ${p.desc} ${p.transcript} ${p.imageText}`) };
   });
   const N = posts.length;
   const idf = (t: string) => Math.log(1 + N / (1 + (df.get(t) ?? 0)));

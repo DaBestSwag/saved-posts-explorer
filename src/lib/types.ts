@@ -13,6 +13,8 @@ export interface Post {
   caption: string;
   hashtags: string;
   desc: string;
+  transcript: string;
+  imageText: string;
 }
 
 export interface PostsFile {
