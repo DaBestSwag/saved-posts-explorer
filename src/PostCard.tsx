@@ -16,12 +16,38 @@ function Video({ code, label }: { code: string; label: string }) {
   // Mounted only when opened, so it picks up the speed last chosen on any card.
   const [speed, setSpeed] = useStored<number>('videoSpeed', 1);
   const ref = useRef<HTMLVideoElement>(null);
+  // Press-and-hold plays at 2× only while held; the chosen speed is untouched.
+  const [held, setHeld] = useState(false);
+  const hold = useRef({ timer: 0, active: false, swallowClick: false });
   useEffect(() => {
     const v = ref.current;
-    if (v) v.defaultPlaybackRate = v.playbackRate = speed;
+    if (v && !hold.current.active) v.defaultPlaybackRate = v.playbackRate = speed;
   }, [speed]);
+  useEffect(() => () => clearTimeout(hold.current.timer), []);
+
+  const endHold = () => {
+    const h = hold.current;
+    clearTimeout(h.timer);
+    if (!h.active) return;
+    h.active = false;
+    setHeld(false);
+    if (ref.current) ref.current.playbackRate = speed;
+    // The release would otherwise count as a tap and pause the video.
+    h.swallowClick = true;
+    setTimeout(() => (h.swallowClick = false), 150);
+  };
+  const startHold = (e: React.PointerEvent<HTMLVideoElement>) => {
+    const v = e.currentTarget;
+    if (v.getBoundingClientRect().bottom - e.clientY < 56) return; // the browser's own control bar
+    hold.current.timer = window.setTimeout(() => {
+      hold.current.active = true;
+      setHeld(true);
+      v.playbackRate = 2;
+    }, 350);
+  };
+
   return (
-    <>
+    <div className="own-wrap">
       <video
         ref={ref}
         className="own-video"
@@ -33,12 +59,23 @@ function Video({ code, label }: { code: string; label: string }) {
         aria-label={label}
         onLoadedMetadata={(e) => (e.currentTarget.playbackRate = speed)}
         // Keeps the button in step when the browser's own speed menu is used.
-        onRateChange={(e) => e.currentTarget.playbackRate !== speed && setSpeed(e.currentTarget.playbackRate)}
+        onRateChange={(e) => !hold.current.active && e.currentTarget.playbackRate !== speed && setSpeed(e.currentTarget.playbackRate)}
+        onPointerDown={startHold}
+        onPointerUp={endHold}
+        onPointerCancel={endHold}
+        onPointerLeave={endHold}
+        onClickCapture={(e) => {
+          if (!hold.current.swallowClick) return;
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onContextMenu={(e) => hold.current.active && e.preventDefault()}
       />
-      <button className={`btn sm speed${speed === 2 ? ' on' : ''}`} aria-pressed={speed === 2} onClick={() => setSpeed(speed === 2 ? 1 : 2)}>
-        {speed === 2 ? '2×' : '1×'} speed
+      <button className={`speed-btn${speed === 2 ? ' on' : ''}`} aria-label="Playback speed" onClick={() => setSpeed(speed === 2 ? 1 : 2)}>
+        {speed}×
       </button>
-    </>
+      {held && <span className="speed-hold">2× ▶▶</span>}
+    </div>
   );
 }
 

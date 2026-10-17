@@ -5,7 +5,6 @@ import { parseQuery, rankHybrid } from './lib/semantic';
 import { CATEGORIES, SUB_PARENTS, catHue } from './lib/cats';
 import { useStored } from './useStored';
 import { PostCard } from './PostCard';
-import { TipsTab } from './TipsTab';
 import { Sheet } from './Sheet';
 import { useLayout } from './useLayout';
 
@@ -23,7 +22,6 @@ type SemStatus = 'idle' | 'loading' | 'ready' | 'error';
 const num = new Intl.NumberFormat('en-US');
 
 export default function App() {
-  const [tab, setTab] = useStored<'explore' | 'tips'>('spe.tab', 'explore');
   const [filtersOpen, setFiltersOpen] = useStored<boolean>('spe.filtersOpen', true);
   const [data, setData] = useState<PostsFile | null>(null);
   const [loadError, setLoadError] = useState('');
@@ -193,14 +191,7 @@ export default function App() {
       <header className="top">
         <div className="top-inner">
           <h1 className="brand">Saved Posts</h1>
-          <nav className="tabs" role="tablist">
-            {(['explore', 'tips'] as const).map((t) => (
-              <button key={t} role="tab" aria-selected={tab === t} className={tab === t ? 'on' : ''} onClick={() => setTab(t)}>
-                {t === 'explore' ? 'Explore' : 'Agentic tips'}
-              </button>
-            ))}
-          </nav>
-          {tab === 'explore' && (
+          {(
             <div className="search">
               <input
                 type="search"
@@ -235,10 +226,8 @@ export default function App() {
         </div>
       </header>
 
-      <main className={tab === 'explore' ? layout : ''}>
-        {tab === 'tips' ? (
-          <TipsTab />
-        ) : loadError ? (
+      <main className={layout}>
+        {loadError ? (
           <p className="empty">Could not load data: {loadError}</p>
         ) : !data ? (
           <p className="empty">Loading…</p>

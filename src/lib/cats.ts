@@ -9,6 +9,8 @@ export const SUB_PARENTS: Record<string, string[]> = {
   // Cooking and Going out labels come from data/extra_subcategories.json.
   Cooking: ['American', 'Asian', 'Italian', 'Mexican', 'Baking & desserts'],
   'Going out': ['Daytime activities', 'Bars', 'Clubs'],
+  'Movies and TV': ['Movies', 'TV shows', 'Commentary'],
+  'Food out': ['American & BBQ', 'Chinese', 'Japanese', 'Korean', 'Vietnamese', 'Indian', 'French', 'Mexican eats'],
 };
 export const parentOf = (sub: string) => Object.keys(SUB_PARENTS).find((p) => SUB_PARENTS[p].includes(sub));
 
