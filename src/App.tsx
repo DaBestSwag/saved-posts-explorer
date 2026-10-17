@@ -195,7 +195,7 @@ export default function App() {
             <div className="search">
               <input
                 type="search"
-                placeholder="Search by meaning, e.g. “videos about ICE”"
+                placeholder="Search..."
                 value={input}
                 onFocus={startSemantic}
                 onChange={(e) => onInput(e.target.value)}
