@@ -57,16 +57,9 @@ a { color: var(--accent); }
   display: grid; grid-template-columns: 1fr; gap: 8px;
 }
 .brand { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-.tabs { display: flex; gap: 4px; background: var(--border); padding: 3px; border-radius: 10px; width: fit-content; }
-.tabs button {
-  border: 0; background: transparent; padding: 6px 14px; border-radius: 8px; color: var(--muted);
-  transition: background 0.3s var(--spring), color 0.3s var(--spring), transform 0.2s var(--spring);
-}
-.tabs button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
-.tabs button:active { transform: scale(0.96); }
 .search { display: flex; flex-direction: column; gap: 4px; }
 .search input {
-  width: 100%; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border);
+  width: 100%; padding: 14px 18px; font-size: 16px; border-radius: 14px; border: 1px solid var(--border);
   background: var(--surface); outline: none; transition: border-color 0.25s var(--spring), box-shadow 0.25s var(--spring);
 }
 .search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
@@ -76,29 +69,23 @@ a { color: var(--accent); }
 .status.loading i { background: #f59e0b; animation: pulse 1s ease-in-out infinite; }
 .status.error i { background: #ef4444; }
 @keyframes pulse { 50% { opacity: 0.3; } }
-.sem { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-height: 26px; }
+.sem { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; min-height: 26px; }
 .btn.sm.dl { margin-left: 0; white-space: nowrap; animation: pop 0.4s var(--spring) both; }
 .dl-bar { display: block; width: 120px; height: 6px; border-radius: 3px; background: var(--border); overflow: hidden; animation: pop 0.4s var(--spring) both; }
 .dl-bar > span { display: block; height: 100%; background: var(--accent); transform-origin: left; transition: transform 0.35s var(--spring); }
 @keyframes pop { from { opacity: 0; transform: scale(0.92); } }
 /* Breakpoints (keep in sync with useLayout.ts): phone < 700, iPad 700–1099, desktop ≥ 1100. */
-/* Phone + iPad: brand and tabs share row 1, search gets its own full-width row. */
-.top-inner { grid-template-columns: auto 1fr; align-items: center; }
-.tabs { justify-self: end; }
-.search { grid-column: 1 / -1; }
+/* Phone + iPad: brand on row 1, search on its own full-width row. Desktop: brand left, search centered. */
+.top-inner { grid-template-columns: 1fr; align-items: center; }
 @media (max-width: 699px) {
   .not-phone { display: none; }
 }
 @media (min-width: 700px) {
   .top-inner { padding: 12px 24px; gap: 10px 16px; }
-  .search { flex-direction: row; align-items: center; gap: 12px; }
-  .search input { flex: 1; }
   .status { white-space: nowrap; }
 }
 @media (min-width: 1100px) {
-  .top-inner { max-width: 1440px; grid-template-columns: auto auto 1fr; gap: 20px; }
-  .tabs { justify-self: start; }
-  .search { grid-column: auto; }
+  .top-inner { max-width: 1440px; grid-template-columns: 1fr minmax(0, 680px) 1fr; gap: 20px; }
 }
 
 main { max-width: 1200px; margin: 0 auto; padding: 16px 16px 64px; }
