@@ -4,3 +4,6 @@ dist/
 public/data/
 *.log
 .wrangler/
+
+# downloaded videos (uploaded to R2, never committed)
+data/videos/

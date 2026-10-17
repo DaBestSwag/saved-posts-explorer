@@ -34,6 +34,11 @@ const parentsOf = {};
 for (const [parent, subs] of Object.entries({ ...(extra._parents || {}), Filmmaking: ['Music videos', 'Cinematography', 'Lighting', 'Color grading', 'Editing'] }))
   for (const s of subs) (parentsOf[s] ||= []).push(parent);
 
+// Shortcodes of videos uploaded to R2 by scripts/upload-videos.mjs; optional.
+const videoFile = path.join(dataDir, 'video_ids.txt');
+const uploaded = new Set(fs.existsSync(videoFile) ? fs.readFileSync(videoFile, 'utf8').split(/\s+/).filter(Boolean) : []);
+const shortcode = (url) => /instagram\.com\/(?:p|reel|tv)\/([\w-]+)/.exec(url)?.[1];
+
 const rows = parseCsv('categorized_saved_posts_full.csv');
 const posts = rows.map((r) => ({
   id: r.media_id,
@@ -55,6 +60,8 @@ const posts = rows.map((r) => ({
 }));
 for (const p of posts) {
   if (overrides[p.id]) p.categories = overrides[p.id];
+  const code = shortcode(p.url);
+  if (code && uploaded.has(code)) p.video = code;
   p.subcategories = p.subcategories.filter((s) => !parentsOf[s] || parentsOf[s].some((c) => p.categories.includes(c)));
 }
 
@@ -75,4 +82,4 @@ posts.forEach((p, i) => {
 fs.writeFileSync(path.join(outDir, 'posts.json'), JSON.stringify({ dims, posts }));
 fs.writeFileSync(path.join(outDir, 'embeddings.bin'), Buffer.from(buf.buffer));
 fs.copyFileSync(path.join(dataDir, 'agentic_tips.md'), path.join(outDir, 'agentic_tips.md'));
-console.log(`[build-data] ${posts.length} posts, ${dims} dims, ${missing} missing embeddings`);
+console.log(`[build-data] ${posts.length} posts, ${dims} dims, ${missing} missing embeddings, ${posts.filter((p) => p.video).length} self-hosted videos`);

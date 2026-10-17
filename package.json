@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "check": "node scripts/check.mjs",
+    "upload-videos": "node scripts/upload-videos.mjs",
     "check:semantic": "tsx scripts/check-semantic.mts"
   },
   "dependencies": {

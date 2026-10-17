@@ -15,6 +15,8 @@ export interface Post {
   desc: string;
   transcript: string;
   imageText: string;
+  /** Instagram shortcode of our own copy at /v/<code>.mp4, when one was uploaded. */
+  video?: string;
 }
 
 export interface PostsFile {
