@@ -79,7 +79,7 @@ function Video({ code, label }: { code: string; label: string }) {
   );
 }
 
-export function PostCard({ post: p, index = 0 }: { post: Post; index?: number }) {
+export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; index?: number; reason?: string; onAsk?: (p: Post) => void }) {
   const [open, setOpen] = useState(false);
   const long = p.caption.length > 200 || p.caption.split('\n').length > 3;
 
@@ -106,6 +106,7 @@ export function PostCard({ post: p, index = 0 }: { post: Post; index?: number })
 
   return (
     <article className="card" style={{ '--i': Math.min(index, 12) } as React.CSSProperties}>
+      {reason && <div className="reason">✨ {reason}</div>}
       <header className="card-head">
         <div className="who">
           <strong>{p.author ? `@${p.author}` : 'Unavailable post'}</strong>
@@ -165,10 +166,19 @@ export function PostCard({ post: p, index = 0 }: { post: Post; index?: number })
           <span key={c} className="chip static sub" style={{ '--h': catHue(c) } as React.CSSProperties}>{c}</span>
         ))}
       </div>
-      {p.url && (
-        <a className="btn open-ig" href={p.url} target="_blank" rel="noopener noreferrer">
-          Open on Instagram ↗
-        </a>
+      {(p.url || onAsk) && (
+        <div className="card-actions">
+          {p.url && (
+            <a className="btn open-ig" href={p.url} target="_blank" rel="noopener noreferrer">
+              Open on Instagram ↗
+            </a>
+          )}
+          {onAsk && (
+            <button className="btn ask-ai" onClick={() => onAsk(p)}>
+              ✨ Ask Claude
+            </button>
+          )}
+        </div>
       )}
     </article>
   );

@@ -4,7 +4,7 @@ import { useEffect, useRef, type PointerEvent, type ReactNode } from 'react';
 const rubber = (d: number, dim: number, c = 0.55) => (d * dim * c) / (dim + c * Math.abs(d));
 
 /** Bottom sheet for phones: slides up, drag the grabber down (or flick) to dismiss. */
-export function Sheet({ open, onClose, title, footer, children }: { open: boolean; onClose: () => void; title: string; footer?: ReactNode; children: ReactNode }) {
+export function Sheet({ open, onClose, title, footer, className = "", children }: { open: boolean; onClose: () => void; title: string; footer?: ReactNode; className?: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const drag = useRef<{ y0: number; last: number; t: number; v: number } | null>(null);
 
@@ -49,7 +49,7 @@ export function Sheet({ open, onClose, title, footer, children }: { open: boolea
   };
 
   return (
-    <div className={`sheet-wrap ${open ? 'open' : ''}`} inert={!open}>
+    <div className={`sheet-wrap ${className} ${open ? "open" : ""}`} inert={!open}>
       <div className="scrim" onClick={onClose} />
       <div className="sheet" ref={ref} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1}>
         <div className="grab" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} aria-hidden>

@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+// @ts-expect-error plain JS module shared with the Worker
+import { localAi } from './worker/local-ai.mjs';
 
 // Same /hf/ model relay the deployed Worker provides (worker/index.js).
 const proxy = {
@@ -8,7 +10,7 @@ const proxy = {
 
 export default defineConfig({
   base: './',
-  plugins: [react()],
+  plugins: [react(), localAi()],
   worker: { format: 'es' },
   build: { chunkSizeWarningLimit: 1500 },
   server: { proxy },

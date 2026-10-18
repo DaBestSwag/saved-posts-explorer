@@ -1,6 +1,8 @@
 // Serves the static site, a /v/ route for our own copies of the videos (R2), and a /hf/ relay for the search model.
 // Hugging Face refuses browser requests from *.workers.dev, but not server-side ones.
-const ALLOWED = '/hf/Xenova/bge-small-en-v1.5/';
+import { handleApi, json } from './ai.js';
+
+const ALLOWED ='/hf/Xenova/bge-small-en-v1.5/';
 const MONTH = 60 * 60 * 24 * 30;
 const VIDEO = /^\/v\/([\w-]+\.mp4)$/;
 
@@ -29,6 +31,8 @@ export default {
     const url = new URL(request.url);
     const video = VIDEO.exec(url.pathname);
     if (video) return serveVideo(request, env, video[1]);
+    if (url.pathname === '/api/ai/engines') return json({ sub: false, api: !!env.ANTHROPIC_API_KEY });
+    if (url.pathname === '/api/ai') return handleApi(request, env);
     if (!url.pathname.startsWith('/hf/')) return env.ASSETS.fetch(request);
     if (!url.pathname.startsWith(ALLOWED) || request.method !== 'GET') return new Response('Not found', { status: 404 });
 

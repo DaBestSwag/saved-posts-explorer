@@ -6,6 +6,9 @@ import { CATEGORIES, SUB_PARENTS, catHue } from './lib/cats';
 import { useStored } from './useStored';
 import { PostCard } from './PostCard';
 import { Sheet } from './Sheet';
+import { ChatPanel } from './ChatPanel';
+import { AISearchPanel, type AskState } from './AISearchPanel';
+import { askAI, postText, useAISettings, type SearchReply } from './lib/ai';
 import { useLayout } from './useLayout';
 
 const BASE = import.meta.env.BASE_URL;
@@ -34,6 +37,18 @@ export default function App() {
   const [shown, setShown] = useState(PAGE);
   const [surprise, setSurprise] = useState<Post | null>(null);
   const layout = useLayout();
+  const ai = useAISettings();
+  const [ask, setAsk] = useState<AskState | null>(null);
+  const [aiOpen, setAiOpen] = useStored<boolean>('spe.aiPanelOpen', true);
+  const askSeq = useRef(0);
+  const [chatPost, setChatPost] = useState<Post | null>(null); // kept after close so the panel can animate out
+  const [chatOpen, setChatOpen] = useState(false);
+  const closeChat = useCallback(() => setChatOpen(false), []);
+  const [similarTo, setSimilarTo] = useState<Post | null>(null);
+  const openChat = useCallback((p: Post) => {
+    setChatPost(p);
+    setChatOpen(true);
+  }, []);
   const [sheet, setSheet] = useState(false); // phone filter sheet
   const closeSheet = useCallback(() => setSheet(false), []);
   useEffect(() => {
@@ -68,6 +83,25 @@ export default function App() {
   const [vec, setVec] = useState<{ text: string; v: Float32Array } | null>(null);
   const [progress, setProgress] = useState(0); // 0..1 of the model file
 
+  // The post vectors (2.5 MB) load on their own: "Find similar" needs them but not the 32 MB model.
+  const [embState, setEmbState] = useState<'idle' | 'loading' | 'ready' | 'error'>('idle');
+  const embPromise = useRef<Promise<void> | null>(null);
+  const loadEmb = () =>
+    (embPromise.current ??= (setEmbState('loading'),
+    fetch(`${BASE}data/embeddings.bin`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`embeddings ${r.status}`);
+        return r.arrayBuffer();
+      })
+      .then((buf) => {
+        embRef.current = new Float32Array(buf);
+        setEmbState('ready');
+      })
+      .catch((e) => {
+        embPromise.current = null;
+        setEmbState('error');
+        throw e;
+      })));
   const startSemantic = () => {
     if (workerRef.current || !data) return;
     setStatus('loading');
@@ -80,13 +114,7 @@ export default function App() {
       if (m.type === 'progress') {
         if (m.file.endsWith('.onnx') && m.total) setProgress(m.loaded / m.total);
       } else if (m.type === 'ready') {
-        fetch(`${BASE}data/embeddings.bin`)
-          .then((r) => r.arrayBuffer())
-          .then((buf) => {
-            embRef.current = new Float32Array(buf);
-            setStatus('ready');
-          })
-          .catch(() => setStatus('error'));
+        loadEmb().then(() => setStatus('ready'), () => setStatus('error'));
       } else if (m.type === 'vec') setVec({ text: m.text, v: m.vec });
       else if (m.type === 'error') setStatus('error');
     };
@@ -136,6 +164,13 @@ export default function App() {
 
   const results: Post[] = useMemo(() => {
     if (!data) return [];
+    if (similarTo) {
+      const row = data.posts.findIndex((p) => p.id === similarTo.id);
+      if (embState !== 'ready' || !embRef.current || row < 0) return [];
+      const d = data.dims;
+      const ranked = rankHybrid(embRef.current.subarray(row * d, (row + 1) * d), embRef.current, d, null, (i) => i !== row);
+      return ranked.slice(0, 30).map((r) => data.posts[r.i]);
+    }
     let ordered: Post[];
     if (searchText && kwIndex) {
       const kw = kwIndex.search(searchText);
@@ -153,7 +188,7 @@ export default function App() {
     if (eff === 'liked') return [...ordered].sort((a, b) => b.likes - a.likes);
     return ordered;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, kwIndex, searchText, passes, sort, semanticLive, vec]);
+  }, [data, kwIndex, searchText, passes, sort, semanticLive, vec, similarTo, embState]);
 
   useEffect(() => setShown(PAGE), [cats, subs, type, sort, searchText]);
 
@@ -175,6 +210,7 @@ export default function App() {
     setInput('');
     setQuery('');
     setSurprise(null);
+    setSimilarTo(null);
   };
   const active = cats.length + subs.length + (type !== 'ALL' ? 1 : 0);
   const dirty = active || input || sort !== 'best';
@@ -182,6 +218,34 @@ export default function App() {
     const pool = data ? (results.length ? results : []) : [];
     if (pool.length) setSurprise(pool[Math.floor(Math.random() * pool.length)]);
   };
+
+  const runAsk = async (q = input.trim()) => {
+    if (!q || !ai.available) return;
+    const top = results.slice(0, 50);
+    const seq = ++askSeq.current;
+    setAsk({ query: q, count: top.length, status: 'loading', answer: '', picks: [], error: '' });
+    setAiOpen(true);
+    try {
+      const r = await askAI<SearchReply>({ kind: 'search', engine: ai.engine, model: ai.model, query: q, candidates: top.map((p) => ({ id: p.id, text: postText(p).slice(0, 900) })) });
+      if (seq !== askSeq.current) return;
+      const byId = new Map(top.map((p) => [p.id, p]));
+      const picks = (r.picks ?? []).flatMap((k) => (byId.has(k.id) ? [{ post: byId.get(k.id)!, reason: k.reason }] : []));
+      setAsk({ query: q, count: top.length, status: 'done', answer: r.answer ?? '', picks, error: '' });
+    } catch (e) {
+      if (seq === askSeq.current) setAsk({ query: q, count: top.length, status: 'error', answer: '', picks: [], error: e instanceof Error ? e.message : String(e) });
+    }
+  };
+  const closeAsk = () => {
+    askSeq.current++;
+    setAsk(null);
+  };
+  const findSimilar = (p: Post) => {
+    setChatOpen(false);
+    setSimilarTo(p);
+    loadEmb().catch(() => {});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  const onAsk = ai.available ? openChat : undefined;
 
   const statusLabel =
     status === 'ready' ? 'Semantic search ready' : status === 'loading' ? `Downloading search model… ${Math.round(progress * 100)}%` : status === 'error' ? 'Keyword search (semantic model unavailable)' : 'Keyword search';
@@ -193,14 +257,23 @@ export default function App() {
           <h1 className="brand">Saved Posts</h1>
           {(
             <div className="search">
-              <input
-                type="search"
-                placeholder="Search..."
-                value={input}
-                onFocus={startSemantic}
-                onChange={(e) => onInput(e.target.value)}
-                aria-label="Search posts"
-              />
+              <div className="search-row">
+                <input
+                  type="search"
+                  placeholder="Search..."
+                  value={input}
+                  onFocus={startSemantic}
+                  onChange={(e) => onInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && ai.available && input.trim() && runAsk()}
+                  aria-label="Search posts"
+                />
+                {ai.available && (
+                  <button className="btn ask-btn" onClick={() => runAsk()} disabled={!input.trim()} title="Ask Claude to pick the best matches">
+                    ✨ <span className="not-phone">Ask Claude</span>
+                    <span className="sr">Ask Claude</span>
+                  </button>
+                )}
+              </div>
               <div className="sem">
                 <span className={`status ${status}`} title={statusLabel}>
                   <i /> {statusLabel}
@@ -303,17 +376,31 @@ export default function App() {
                     <button className="btn ghost sm" onClick={() => setSurprise(null)}>Close</button>
                   </span>
                 </div>
-                <PostCard key={surprise.id} post={surprise} />
+                <PostCard key={surprise.id} post={surprise} onAsk={onAsk} />
               </div>
             )}
 
+            {similarTo && (
+              <div className="similar-banner" role="status">
+                <span>
+                  Similar to @{similarTo.author || 'post'}
+                  {embState === 'error' ? ' · couldn’t load, close and try again' : embState !== 'ready' ? ' · loading…' : ''}
+                </span>
+                <button className="btn sm" onClick={() => setSimilarTo(null)} aria-label="Dismiss similar posts">×</button>
+              </div>
+            )}
+
+            {ask && (
+              <AISearchPanel ask={ask} input={input} ai={ai} open={aiOpen} setOpen={setAiOpen} onClose={closeAsk} onRetry={() => runAsk(ask.query)} onAsk={onAsk} />
+            )}
+
             {results.length === 0 ? (
-              <p className="empty">No posts match. Try clearing a filter.</p>
+              similarTo && embState !== 'error' ? null : <p className="empty">No posts match. Try clearing a filter.</p>
             ) : (
               <>
                 <div className="grid">
                   {results.slice(0, shown).map((p, i) => (
-                    <PostCard key={p.id} post={p} index={i % PAGE} />
+                    <PostCard key={p.id} post={p} index={i % PAGE} onAsk={onAsk} />
                   ))}
                 </div>
                 {shown < results.length && (
@@ -383,6 +470,7 @@ export default function App() {
           })()
         )}
       </main>
+      {ai.available && <ChatPanel post={chatPost} open={chatOpen} onClose={closeChat} ai={ai} phone={layout === 'phone'} onSimilar={findSimilar} />}
     </>
   );
 }
