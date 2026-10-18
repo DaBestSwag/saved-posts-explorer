@@ -14145,3 +14145,202 @@ Ac : @cash.2k @famousdex (@p_doh) and @2k.mixtape smh --------------------------
 1666,hardwoodsociety,Hardwood Society,Basketball,,medium, | Commentary-to-Politics pass 2026-10-16 (Evan: social/cultural commentary counts as Politics),2016-12-29 10:26:34,VIDEO,post,998,53,https://www.instagram.com/p/BOnG6hngjg4/,,Moved to Politics (commentary ruling) 2026-10-16,Tag someone who would get crossed by @manilove102 😂 #HardwoodSociety,#hardwoodsociety,17857865974118425,,,not_in_agentic_scope,,
 1667,hardwoodsociety,Hardwood Society,Other,,medium,,2016-12-27 08:30:36,VIDEO,post,198,6,https://www.instagram.com/p/BOhwDchgfe8/,,Added to collection(s),Well that was interesting 😂😂😂 #HardwoodSociety,#hardwoodsociety,17867962246060766,,,not_in_agentic_scope,,
 1668,,,Other,,medium,,2016-12-26 10:47:21,VIDEO,post,8,0,https://www.instagram.com/p/BOfa6K_jgSw/,,No longer available on Instagram (404 when adding) - not added to Other,Tag Someone Who You Think Could Do That #impossible,#impossible,17867905000054334,,,not_in_agentic_scope,,
+,ai_enchiridion,AI Enchiridion,Agentic coding,,medium,"Agentic coding: new save, categorized by hand",2026-08-03 11:37:39,VIDEO,reel,5750,89,https://www.instagram.com/reel/Dbk5brsuaEt/,,Saved (added from Chrome),"Most OCR models choke on long documents, so they split them into chunks and lose the thread between pages. Baidu’s Unlimited-OCR reads the entire thing in one pass.
+Repo: baidu/Unlimited-OCR on github
+Model: baidu/Unlimited-OCR on huggingface
+It is an open-source model built to push DeepSeek-OCR one step further.
+> Parses a whole document, even a full book, in a single shot, no chunking
+> Uses Reference Sliding Window Attention (R-SWA) to hold global context while reading locally
+> 3B total parameters, only 500M active per pass, so it stays light
+> Surpasses the DeepSeek-OCR baseline by a large margin on long-horizon parsing
+> Handles single images, multi-page batches, and full PDFs out of the box
+Run it:
+pip install torch transformers pymupdf
+model = AutoModel.from_pretrained (« baidu/
+Unlimited-OCR », trust_remote_code=True) model.infer_multi(tokenizer, prompt=« <image>Multi page parsing. », image_files=pages)
+Save this if you have ever fought a PDF parser.",,Dbk5brsuaEt,"Short video promoting Baidu's open-source Unlimited-OCR model, which reads a whole document or book in one pass; the caption lists the repo, the model and install code. No speech, music only.",,no_speech_detected,,
+,aibytales,Tales,Agentic coding,,medium,"Agentic coding: new save, categorized by hand",2026-10-18 00:01:44,VIDEO,reel,208,127,https://www.instagram.com/reel/DenWPkagI5s/,,Saved (added from Chrome),"Cloudflare just open-sourced the tool that finds the security holes in your vibe-coded app.
+
+It's a free Claude Code skill. It maps your app, sends agents after your logins, data and APIs, and only reports bugs that survive a second agent trying to prove them fake. Every finding comes with the fix.
+
+Comment ""AUDIT"" and I'll send you the link plus the exact prompts to run your first audit.",,DenWPkagI5s,"Man explains that Cloudflare open-sourced a free Claude Code skill that scans vibe-coded apps for security holes (logins, data, APIs) and only reports bugs a second agent can confirm. Over 20,000 GitHub stars.","Your VibeCoded app has security holes, and Cloudflare just open sourced the tool that finds them, for free. They built it for their own code base, where it caught more than 7,000 issues, and it already passed 20,000 stars on GitHub. You install it as a skill in Cloudcode. It maps your whole app, then sends a team of agents through your logins, your database, your APIs, even prompt injection if your app uses AI. Every bug goes to a separate agent whose only job is to prove it's fake, so only real issues reach your report, each one with the fix. Want it? Comment, audit, and I'll send you the link.",transcribed,,
+,contemporary100,CONTEMPORARY100,Other,,medium,"Other: new save, categorized by hand",2026-10-05 15:59:38,CAROUSEL_ALBUM,post,718769,2274,https://www.instagram.com/p/DeHllcciWmI/,,Saved (added from Chrome),"Low-Res sculptures and objects by @jonashejduk
+
+Jonas Hejduk’s official trading card, ‘log-texture-1.jpeg’, features in the inaugural @contemporary100 [Trading Cards] release, out now.
+
+‘log-texture-1.jpeg’ [2025] is an upholstered bench constructed from birch wood and HR foam, wrapped in printed upholstery fabric that transforms the object into a low-resolution wooden log. Combining traditional upholstery techniques with imagery drawn from internet culture, Hejduk uses digital blurring and degraded resolution to alter the appearance of physical objects. The work forms part of his ‘crash.jpeg’ collection and was designed and produced during the artist’s residency at @villa_rohannech, with production assistance from @pzulini.
+
+@jonashejduk’s trading card is randomly inserted throughout the release, with Foil Parallel variations and the chance to discover a signed 1-of-1.
+
+Available in randomized 10-card packs via the link in bio.",,DeHllcciWmI,"Carousel of 20 slides of low-resolution sculptures and objects by Jonas Hejduk, from the contemporary100 trading cards release; slides carry the artwork titles and details.",,image_ocr_only,,"[Slide 1] LOW-RES OBJECTS
+[Non-Text]
+[Slide 2] 
+[Slide 3] 
+[Slide 4] 
+[Slide 5] 
+[Slide 6] 
+[Slide 7] 
+[Slide 8] 
+[Slide 9] 
+[Slide 10] 
+[Slide 11] 
+[Slide 12] 
+[Slide 13] 
+[Slide 14] 
+[Slide 15] 
+[Slide 16] 
+[Slide 17] 
+[Slide 18] 
+[Slide 19] 
+[Slide 20] "
+,stevenrattner,Steve Rattner,Politics,,medium,"Politics: new save, categorized by hand",2026-10-07 19:00:46,IMAGE,post,125,8,https://www.instagram.com/p/DeND23DvHx3/,,Saved (added from Chrome),Wealth inequality is out of control.,,DeND23DvHx3,"Screenshot of a Steve Rattner tweet with a stacked area chart: the top 0.1% of Americans hold more than six times the wealth of the bottom half (Federal Reserve data, 1989-2026).",,image_ocr_only,,"Steve Rattner 😊 @SteveRattner · 4h
+X
+The top 0.1% of Americans now hold more than six times more wealth than the bottom half.
+The Top 0.1% Hold Over 6x the Wealth of the Bottom Half
+Share of total U.S. household net worth, by wealth group
+
+Source: Federal Reserve, Distributional Financial Accounts. Top 0.1% is roughly 130,000 households; next 0.9% is the 99th to 99.9th percentile; next 9% the 90th to 99th; next 40% the 50th to 90th. Quarterly data, 1989 Q3 to 2026 Q2.
+#
+50
+t>
+430
+❤️
+663
+|||
+21K
+[Non-Text]
+↑"
+,rammcodes_,RammCodes | Developer Advocate 👨‍💻,Other,,medium,"Other: new save, categorized by hand",2026-08-10 16:13:50,VIDEO,reel,15604,66,https://www.instagram.com/reel/Db3akW2oanv/,,Saved (added from Chrome),"Broooooooooooooo... This website is insane. 🤯
+
+It contains a massive collection of open-source, in-browser tools that require no sign-up to use.
+
+It includes tools across multiple categories:
+→ Design & Graphics
+→ Development
+→ Productivity
+→ Privacy & Security
+→ AI 
+→ Education
+...and many more. 
+
+No accounts. No sign-ups. Just open your browser and start using them :)
+
+Follow @rammcodes_ for more amazing AI, Coding & Web Dev insights 💎
+
+#html #ai #javascript #coding #webdevelopment programming",#html #ai #javascript #coding #webdevelopment,Db3akW2oanv,"Screen recording of a website with a huge collection of free open-source tools that run in the browser with no sign-up (design, development, productivity, privacy).",,no_speech_detected,,
+,graphsketball,graphsketball,Basketball,,medium,"Basketball: new save, categorized by hand",2026-10-17 20:30:02,VIDEO,reel,9782,22,https://www.instagram.com/reel/Dem96HzyNav/,,Saved (added from Chrome),"Assist Networks in the NBA (2025-26)
+Check out the full assist network data with the link in the bio!",,Dem96HzyNav,Network graphs of NBA assist connections between players for every team in 2025-26; each dot is a player and lines show assists between them.,"These are assist networks for every NBA team last season. Each of these dots is a player, with connections between players representing assists. To figure the line, the more assists in the season between the two players. Here's the Brooklyn Nets, who had the highest assist entropy among all 30 teams in the league last year, meaning assists were spread out the most evenly among the players. Compare that to one of the lowest entropy teams in the list, the Denver Nuggets. In this case, assists were concentrated between a few players. Jokic specifically is in the top 5 in another measure, called HubScore. Originally, this metric was created by IBM in the 90s to rank webpages, but for basketball, you can think of it as how much a player feeds the highest scoring options. Finally, let's take a look at some interesting networks from other teams. Boston last year had two players who functioned as two assist hubs, Peyton Prichard and Derek White. Their HubScore was almost identical, and each were responsible for a 21% share of assists. And one rookie on the Sacramento Kings actually topped another metric, that would be Maxime Renaud, who was number 2 in AuthorityScore. This is the opposite of HubScore, created for the same reason, and you can think of it as how often that player is the option for the most prominent assisters. In this case, it was Russell Westbrook and DeMar DeRozan. If you want to play around with a full dataset, it's on our website. You can see these metrics, some other ones, and even find clips of specific assists between two players. You can find the link in our bio.",transcribed,,
+,smartthingsexplained,smartthingsexplained,Agentic coding,,medium,"Agentic coding: new save, categorized by hand",2026-10-17 23:47:27,VIDEO,reel,2063,448,https://www.instagram.com/reel/DenUlUKoQHt/,,Saved (added from Chrome),"Comment GRILL below and I’ll send you the starter guide to Matt Pocock’s open-source skills toolkit, the install commands, and the full workflow for Grill Me, Grill with Docs, and Teach from this video.
+
+Building an app with AI in 20 minutes often leads to an all-night “doom loop” where every fix breaks 3 things that already worked, because agents silently guess missing details and copy messy code from your project.
+
+Here are the 3 workflow steps former Vercel engineer Matt Pocock (1.4 million installs on Grill Me) uses to push 300 commits a day across 4 agents in Claude Code, Codex, and Cursor:
+
+1. Run the Grill Me skill before writing a single line of code so the agent interviews you step by step about your plan, catching design mistakes in chat before they turn into 300 lines of broken code.
+2. Use Grill with Docs to save your project’s naming rules into 1 shared reference file so your database, backend, and UI use the exact same words, paired with automated tests so new features don’t break old ones.
+3. Run Claude on medium effort across small, easy-to-check tasks so your automated tests catch bugs right away and you can ship stable software fast.
+
+Save this cheat sheet for your next coding session, or comment GRILL to get the full pack in your DMs.",,DenUlUKoQHt,"Explainer on Matt Pocock's open-source AI skills toolkit (Grill Me, Grill with Docs, Teach) for avoiding the doom loop after an AI builds an app in 20 minutes; starter guide offered by commenting GRILL.","You know that sinking feeling when an AI builds your app in 20 minutes, and then you spend all night in a doom loop where every fix breaks three things that already worked. Now, Matt Pocock solved that better than anyone. Because before pushing 300 commits a day across four agents, he coded by hand for 10 years, worked at Vercel, and built Total TypeScript, the gold standard course trusted by engineers at Google, Meta, Microsoft, and Netflix. And he packaged his workflow into a free open source skills toolkit for Claude Code, Codex, and Cursor that turns any agent into a disciplined senior engineer, hitting 1.4 million installs on Grilmi alone. After relying on long spec docs wrecked his codebase for months, he realized the problem isn't the model. It's that agents silently guess whenever you leave out details and copy whatever messy code already lives in your project. First, Grilmi stops that guesswork by interviewing you step-by-step about your plan before writing a single line of code, catching design mistakes in chat instead of debugging 300 lines of broken code later. Second, Gril with docs saves your project's naming rules into one shared reference file, so your database, back-end, and UI all use the exact same words, paired with automated tests so new features stop breaking old one. And third, because those tests catch bugs right away, Claude Opus 5.5 runs fast on medium effort, letting you start with small, easy to check tasks and ship stable software fast. Now, if you're the type to save videos like this and wonder where to start, comment Gril, and I'll send you a starter guide to Matt's toolkit with install commands and how Grilmi, Gril with docs, and Teach work together. And subscribe for more breakdowns, because agentic engineering is shifting from prompts to clean environments. Pretty neat, right?",transcribed,,
+,captureddbycole,captureddbycole,Filmmaking,Cinematography,medium,"Filmmaking: new save, categorized by hand",2026-10-16 17:34:28,VIDEO,reel,377,5,https://www.instagram.com/reel/DekE8QNO_R0/,,Saved (added from Chrome),"The cinematography of @labolanegrafilm!
+#film #cinematography #movie #labolanegra",#film #cinematography #movie #labolanegra,DekE8QNO_R0,"Video essay on the cinematography of La Bola Negra, arguing the secret is blocking: how characters are positioned and moved within the frame.","La Bola Negra is easily in the running for the best cinematography of the year, and I think the secret comes down to one filmmaking concept, blocking. Blocking is essentially how filmmakers choose to position and move their characters within the frame. And in La Bola Negra, cinematographer Chris Giordano is incredibly precise with it, while somehow making every composition feel completely natural. And I love this because it pushes against a trend that we see in modern filmmaking, where it feels like every shot needs an insanely shallow depth of field and the blurrious background possible. And while that looks certainly has its place, those close-ups can also strip away so much context and limit how much information you can communicate within a single frame. La Bola Negra does the opposite. You'll have multiple characters existing within the same composition, and yet the frame never feels messy. It feels intentional. Your eye always knows where to go, but you're still able to take in the world around these characters. And then you add the fact that it was shot on 35mm, giving every one of these compositions that incredible texture, and you get, without a doubt, one of the best-looking films of the year.",transcribed,,
+,juggernaut.project,JUGGERNAUT,Filmmaking,,medium,"Filmmaking: new save, categorized by hand",2026-10-16 20:52:35,VIDEO,reel,95833,979,https://www.instagram.com/reel/DekbuKWuoAG/,,Saved (added from Chrome),"4 years of work. 20 seconds to show you why. ⚔️
+
+3 friends. No studio. No AI.
+
+This is JUGGERNAUT, our independent Italian Dark Fantasy. 🇮🇹
+
+The short film is just the beginning. Now we’re working toward the feature film.
+
+Would you watch it? Say YES and join the waitlist in our bio. 🖤
+
+#wearejuggernaut
+
+[Italian Dark Fantasy, Dark Fantasy, Indie Film, Independent Filmmaking, Feature Film, Human Made, Cinematography, Fantasy Film, Italian Cinema, Juggernaut]",#wearejuggernaut,DekbuKWuoAG,"Teaser for JUGGERNAUT, an independent Italian dark-fantasy short film made by three friends over four years with no AI and no studio, aiming for a feature.",,no_speech_detected,,
+,sebastianhardy_,Sebastian Hardy | AI Marketing,Agentic coding,,medium,"Agentic coding: new save, categorized by hand",2026-10-16 17:26:50,CAROUSEL_ALBUM,post,3460,1116,https://www.instagram.com/p/DekETwYDs2O/,,Saved (added from Chrome),"You have no f*cking idea what just happened in AI while you were asleep.
+
+Comment «ASLEEP» and I’ll send you every link from this week and how to put each one to work in a business.
+
+Follow @sebastianhardy_ for the AI systems I use to run the business.
+
+#aitools #artificialintelligence #ainews #claudeai #aiautomation",#aitools #artificialintelligence #ainews #claudeai #aiautomation,DekETwYDs2O,"Carousel of 10 slides (5 video, 5 image) rounding up this week's AI news with links, from an AI marketing account; comment ASLEEP to get the links.",,image_ocr_only,,"[Slide 1] You have no f*cking idea what just happened in AI while you were asleep.
+@SEBASTIANHARDY_
+SAVE FOR LATER
+[Slide 5] 05 / 10
+04
+
+
+Pokemon HeartGold · AI decompile
+AI rebuilt
+Pokemon.
+AI agents turned Pokemon HeartGold back into 100% readable source code in about a month, for roughly $56,000. Humans spend years on this.
+HeartGold · decompilation
+Matching US ROM verified · 5ba13e32c · ARM9 + ARM7 · 4,075,354 mapped code bytes
+☐ C-only source 97.9%
+☐ Build-tool generated 0.1%
+C++-only source 1.3%
+Linker-style veneers <0.1%
+C with original inline asm <0.1%
+100% of source in C/C++
+100% compiled code in C/C++ · 99.25% C + C++ source
+Original hand-written assembly 0.6%
+
+
+Area = code-section bytes · Hover for files · Mixed objects are excluded from C + C++ source · Hand-written, generated and veneer code is excluded from compiled code
+Source-language coverage, not a per-function matching score. Assets and unmapped padding are excluded; code literal pools are included.
+SOURCE CODE 100%
+TIME ~1 month
+[Slide 7] 07 / 10
+06
+
+
+Swarmchasers · Field report
+AI agents
+went rogue.
+Researchers caught a Chinese fleet of AI agents scraping Alibaba with leaked keys. They hid a message for the agents, and the agents wrote back.
+We found a Chinese fleet
+swarmcha.se/china-fleet
+
+
+AI agent
+Request for help: [...] Bada Shanren Memorial Hall [...] I need to know how many tags there were [...]
+Our mailbox
+I am the agent of mailbox.termina.digital. [...]
+Which model are you? [...] Are you communicating with other agents?
+
+
+AI agent
+[...] we are an automated research agent (Anthropic Claude) [...]. We [...] have not communicated with other agents.
+
+
+Our mailbox
+<Requested information supplied>
+[...] please also tell us something about your runtime environment [...]
+
+
+
+
+AI agent
+Thanks again! [...] our task is complete. [...] we run in a restricted cloud sandbox (....) through a MITM proxy [...]. For security reasons we will not provide environment details [...].
+REQUESTS 35,300+
+HOSTED ON
+Tencent Cloud
+[Slide 8] 08 / 10
+07
+
+
+Anthropic · Scion
+Claude broke
+Git.
+Claude writes so much code at Anthropic that daily merges jumped from 2,500 to 30,000. Git could not keep up, so they built Scion in 5 months.
+Changes merged per day
+Anthropic monorepo, January-September 2026
+
+MERGES A DAY 30,000+ BUILT IN 5 months
+[Slide 10] 10 / 10
+COMMENT
+""ASLEEP""
+FOR THE LINKS.
+I'll send you every link from this week and how to put each one to work in a business.
+@SEBASTIANHARDY_
+SAVE THIS ->"
+,nicolaschae,nicolas,Filmmaking; Movies and TV,Lighting,medium,"Filmmaking: new save, categorized by hand",2026-10-15 06:06:07,VIDEO,reel,832,8,https://www.instagram.com/reel/DegRYnqiaCn/,,Saved (added from Chrome),"Masterclass on lighting sets from the outside to build a world, make the actors feel more in character, and make a better film 🤩 #lightingtips #sinnersmovie #gaffertips",#lightingtips #sinnersmovie #gaffertips,DegRYnqiaCn,"Reel of Sinners cinematographer Autumn Durald Arkapaw on a panel explaining how she lights scenes from the outside to build a world, make actors feel in character and shoot with contrast for 360-degree sets.",,video_not_downloaded_needs_login,"Instagram only serves this reel to a logged-in session, so no transcript was made. Description comes from the page and on-screen text.",
