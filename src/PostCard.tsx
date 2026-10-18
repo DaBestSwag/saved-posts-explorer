@@ -38,7 +38,7 @@ function Video({ code, label }: { code: string; label: string }) {
   };
   const startHold = (e: React.PointerEvent<HTMLVideoElement>) => {
     const v = e.currentTarget;
-    if (v.getBoundingClientRect().bottom - e.clientY < 56) return; // the browser's own control bar
+    if (v.paused || v.getBoundingClientRect().bottom - e.clientY < 56) return; // nothing to speed up, or the browser's own control bar
     hold.current.timer = window.setTimeout(() => {
       hold.current.active = true;
       setHeld(true);
@@ -102,7 +102,7 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
     };
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
-  }, [embed]);
+  }, [embed, p.video]);
 
   return (
     <article className="card" style={{ '--i': Math.min(index, 12) } as React.CSSProperties}>

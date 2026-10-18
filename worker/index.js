@@ -2,14 +2,21 @@
 // Hugging Face refuses browser requests from *.workers.dev, but not server-side ones.
 import { handleApi, json } from './ai.js';
 
-const ALLOWED ='/hf/Xenova/bge-small-en-v1.5/';
+const ALLOWED = '/hf/Xenova/bge-small-en-v1.5/';
 const MONTH = 60 * 60 * 24 * 30;
 const VIDEO = /^\/v\/([\w-]+\.mp4)$/;
 
 // Range requests are what let the player seek without downloading the whole file.
 async function serveVideo(request, env, key) {
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed', { status: 405 });
-  const obj = await env.VIDEOS.get(key, { range: request.headers, onlyIf: request.headers });
+  let obj;
+  try {
+    obj = await env.VIDEOS.get(key, { range: request.headers, onlyIf: request.headers });
+  } catch (err) {
+    // A range starting past the end of the file; any other failure is a real error.
+    if (!request.headers.has('range')) throw err;
+    return new Response(null, { status: 416, headers: { 'content-range': 'bytes */*' } });
+  }
   if (!obj) return new Response('Not found', { status: 404 });
   const headers = new Headers({ 'content-type': 'video/mp4', 'accept-ranges': 'bytes', 'cache-control': `public, max-age=${MONTH}`, etag: obj.httpEtag });
   if (!('body' in obj)) return new Response(null, { status: 304, headers });
