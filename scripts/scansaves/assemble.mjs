@@ -34,8 +34,8 @@ for (const p of POSTS) {
 
   let transcript = '', imageText = '', status = '', note = '';
   if (m) {
-    status = 'video_not_downloaded_needs_login';
-    note = 'Instagram only serves this reel to a logged-in session, so no transcript was made. Description comes from the page and on-screen text.';
+    status = m.status || 'video_not_downloaded_needs_login';
+    note = m.note || 'Instagram only serves this reel to a logged-in session, so no transcript was made. Description comes from the page and on-screen text.';
   } else if (isCarousel) {
     const parts = [], slides = [];
     itemIds.forEach((id, i) => {
@@ -69,10 +69,10 @@ for (const p of POSTS) {
     why: `${p.cats[0]}: new save, categorized by hand`,
     published: iso(m ? m.ts : info.timestamp),
     media_type: m ? m.mediaType : isCarousel ? 'CAROUSEL_ALBUM' : videos.length ? 'VIDEO' : 'IMAGE',
-    post_type: videos.length || m ? 'reel' : 'post',
+    post_type: videos.length || (m && m.mediaType === 'VIDEO') ? 'reel' : 'post',
     likes: m ? m.likes : info.like_count ?? 0,
     comments: m ? m.comments : info.comment_count ?? 0,
-    url: `https://www.instagram.com/${videos.length || m ? 'reel' : 'p'}/${p.code}/`,
+    url: `https://www.instagram.com/${videos.length || (m && m.mediaType === 'VIDEO') ? 'reel' : 'p'}/${p.code}/`,
     manual_collections: '',
     instagram_status: 'Saved (added from Chrome)',
     caption,
