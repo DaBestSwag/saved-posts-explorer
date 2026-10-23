@@ -7,3 +7,7 @@ public/data/
 
 # downloaded videos (uploaded to R2, never committed)
 data/videos/
+
+# scan scratch folder (downloads, transcripts, OCR)
+scan-work/
+new-posts/
