@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const read = (f) => JSON.parse(fs.readFileSync(path.join(dir, f), 'utf8'));
-const transcripts = read('transcripts.json');
+const transcripts = fs.existsSync(path.join(dir, 'transcripts.json')) ? read('transcripts.json') : {}; // absent when the scan had no videos
 const files = fs.readdirSync(dir);
 
 // Hand-written per post (categories + short description from caption / transcript / slide text), in posts.json next to this script:
@@ -58,6 +58,7 @@ for (const p of POSTS) {
     status = 'image_ocr_only';
   }
 
+  if (!m && !info) throw new Error(`${p.code}: no .info.json in this folder; download it again or add a "manual" block in posts.json`);
   const caption = m ? m.caption : (info.description || info.title || '').trim();
   rows.push({
     rank_saved_order: '',

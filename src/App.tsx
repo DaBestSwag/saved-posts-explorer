@@ -21,7 +21,7 @@ const TYPES = [
 ];
 type Sort = 'best' | 'new' | 'old' | 'liked' | 'added';
 const EARLIER = 'EARLIER';
-const addedLabel = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const addedLabel = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', ...(d.slice(0, 4) === String(new Date().getFullYear()) ? {} : { year: 'numeric' }) });
 type SemStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 const num = new Intl.NumberFormat('en-US');

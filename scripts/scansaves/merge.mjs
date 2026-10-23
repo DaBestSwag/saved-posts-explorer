@@ -7,7 +7,10 @@ import Papa from 'papaparse';
 import { pipeline } from '@xenova/transformers';
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
-const dataDir = path.resolve(dir, '..', 'data');
+// Works from scan-work/ (copied there) or in place in scripts/scansaves/: the nearest ancestor folder that has data/.
+let root = dir;
+while (!fs.existsSync(path.join(root, 'data', 'categorized_saved_posts_full.csv'))) root = path.dirname(root);
+const dataDir = path.join(root, 'data');
 const csvPath = path.join(dataDir, 'categorized_saved_posts_full.csv');
 const embPath = path.join(dataDir, 'embeddings.csv');
 
