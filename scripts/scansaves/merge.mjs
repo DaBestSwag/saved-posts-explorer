@@ -31,4 +31,10 @@ for (const r of fresh) {
 const csvChunk = Papa.unparse({ fields: header, data: fresh.map((r) => header.map((h) => r[h] ?? '')) }, { header: false, newline: '\r\n' });
 fs.appendFileSync(csvPath, csvChunk + '\r\n');
 fs.appendFileSync(embPath, embLines.join('\r\n') + '\r\n');
+// Record today as the "date added" for the new rows (used by the site's Date added filter and Recently added sort).
+const addedPath = path.join(dataDir, 'added_dates.json');
+const added = fs.existsSync(addedPath) ? JSON.parse(fs.readFileSync(addedPath, 'utf8')) : {};
+const today = new Date().toLocaleDateString('en-CA');
+for (const r of fresh) added[r.media_id] = today;
+fs.writeFileSync(addedPath, JSON.stringify(added, null, 1) + '\n');
 console.log(`appended ${fresh.length} rows to the CSV and ${embLines.length} vectors (${embLines[0].split(',').length - 1} dims)`);

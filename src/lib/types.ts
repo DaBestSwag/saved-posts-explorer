@@ -1,5 +1,9 @@
 export interface Post {
   id: string;
+  /** Date added to the site (YYYY-MM-DD); empty for posts from the original export. */
+  added: string;
+  /** Save order, higher = saved more recently. */
+  order: number;
   url: string;
   author: string;
   authorName: string;

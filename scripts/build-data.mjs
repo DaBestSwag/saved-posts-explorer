@@ -39,9 +39,16 @@ const videoFile = path.join(dataDir, 'video_ids.txt');
 const uploaded = new Set(fs.existsSync(videoFile) ? fs.readFileSync(videoFile, 'utf8').split(/\s+/).filter(Boolean) : []);
 const shortcode = (url) => /instagram\.com\/(?:p|reel|tv)\/([\w-]+)/.exec(url)?.[1];
 
+// Date each post was added to the site (id -> YYYY-MM-DD); posts from the original export have none.
+const addedFile = path.join(dataDir, 'added_dates.json');
+const addedDates = fs.existsSync(addedFile) ? JSON.parse(fs.readFileSync(addedFile, 'utf8')) : {};
+
 const rows = parseCsv('categorized_saved_posts_full.csv');
-const posts = rows.map((r) => ({
+const posts = rows.map((r, i) => ({
   id: r.media_id,
+  added: addedDates[r.media_id] || '',
+  // Save order, higher = saved more recently: the original export's rank (1 = newest save) counts down from 0, later-appended rows count up.
+  order: int(r.rank_saved_order) ? -int(r.rank_saved_order) : i + 1,
   url: r.url || '',
   author: r.author || '',
   authorName: r.author_name || '',

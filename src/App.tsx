@@ -19,7 +19,9 @@ const TYPES = [
   { v: 'IMAGE', label: 'Images' },
   { v: 'CAROUSEL_ALBUM', label: 'Carousels' },
 ];
-type Sort = 'best' | 'new' | 'old' | 'liked';
+type Sort = 'best' | 'new' | 'old' | 'liked' | 'added';
+const EARLIER = 'EARLIER';
+const addedLabel = (d: string) => new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 type SemStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 const num = new Intl.NumberFormat('en-US');
@@ -31,6 +33,7 @@ export default function App() {
   const [cats, setCats] = useState<string[]>([]);
   const [subs, setSubs] = useState<string[]>([]);
   const [type, setType] = useState('ALL');
+  const [added, setAdded] = useState('ALL'); // 'ALL' | a date added | EARLIER
   const [sort, setSort] = useState<Sort>('best');
   const [input, setInput] = useState('');
   const [query, setQuery] = useState(''); // debounced
@@ -157,8 +160,11 @@ export default function App() {
       const picked = (SUB_PARENTS[c] ?? []).filter((s) => subs.includes(s));
       return !picked.length || p.subcategories.some((s) => picked.includes(s));
     };
-    return (p: Post) => (!cats.length || cats.some((c) => inCat(p, c))) && (type === 'ALL' || p.mediaType === type);
-  }, [cats, subs, type]);
+    const inAdded = (p: Post) => added === 'ALL' || (added === EARLIER ? !p.added : p.added === added);
+    return (p: Post) => (!cats.length || cats.some((c) => inCat(p, c))) && (type === 'ALL' || p.mediaType === type) && inAdded(p);
+  }, [cats, subs, type, added]);
+  // Dates posts were added on, newest first; the rest of the posts are "Earlier".
+  const addedDates = useMemo(() => [...new Set((data?.posts ?? []).map((p) => p.added).filter(Boolean))].sort().reverse(), [data]);
 
   const semanticLive = status === 'ready' && !!searchText && vec?.text === searchText && !!embRef.current;
 
@@ -186,11 +192,12 @@ export default function App() {
     if (eff === 'new') return [...ordered].sort((a, b) => b.published.localeCompare(a.published));
     if (eff === 'old') return [...ordered].sort((a, b) => a.published.localeCompare(b.published));
     if (eff === 'liked') return [...ordered].sort((a, b) => b.likes - a.likes);
+    if (eff === 'added') return [...ordered].sort((a, b) => b.order - a.order);
     return ordered;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, kwIndex, searchText, passes, sort, semanticLive, vec, similarTo, embState]);
 
-  useEffect(() => setShown(PAGE), [cats, subs, type, sort, searchText]);
+  useEffect(() => setShown(PAGE), [cats, subs, type, added, sort, searchText]);
 
   const toggle = (list: string[], set: (v: string[]) => void, v: string) =>
     set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -203,6 +210,7 @@ export default function App() {
     setCats([]);
     setSubs([]);
     setType('ALL');
+    setAdded('ALL');
   };
   const clearAll = () => {
     clearFilters();
@@ -212,7 +220,7 @@ export default function App() {
     setSurprise(null);
     setSimilarTo(null);
   };
-  const active = cats.length + subs.length + (type !== 'ALL' ? 1 : 0);
+  const active = cats.length + subs.length + (type !== 'ALL' ? 1 : 0) + (added !== 'ALL' ? 1 : 0);
   const dirty = active || input || sort !== 'best';
   const doSurprise = () => {
     const pool = data ? (results.length ? results : []) : [];
@@ -337,6 +345,18 @@ export default function App() {
                     </button>
                   ))}
                 </div>
+                {addedDates.length > 0 && (
+                  <>
+                    <div className="group-label">Date added</div>
+                    <div className="seg" role="group" aria-label="Date added">
+                      {[{ v: 'ALL', label: 'Any' }, ...addedDates.map((d) => ({ v: d, label: addedLabel(d) })), { v: EARLIER, label: 'Earlier' }].map((t) => (
+                        <button key={t.v} className={added === t.v ? 'on' : ''} aria-pressed={added === t.v} onClick={() => setAdded(t.v)}>
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             );
             const filtersLabel = `Filters${active ? ` · ${active} active` : ''}`;
@@ -357,6 +377,7 @@ export default function App() {
                   <span className="sr">Sort</span>
                   <select value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
                     <option value="best">Best match</option>
+                    <option value="added">Recently added</option>
                     <option value="new">Newest</option>
                     <option value="old">Oldest</option>
                     <option value="liked">Most liked</option>
