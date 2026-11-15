@@ -21,6 +21,8 @@ export interface Post {
   imageText: string;
   /** Instagram shortcode of our own copy at /v/<code>.mp4, when one was uploaded. */
   video?: string;
+  /** GitHub repos the post shows or names (agentic coding posts only). */
+  repos?: string[];
 }
 
 export interface PostsFile {

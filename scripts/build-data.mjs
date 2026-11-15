@@ -43,6 +43,12 @@ const shortcode = (url) => /instagram\.com\/(?:p|reel|tv)\/([\w-]+)/.exec(url)?.
 const addedFile = path.join(dataDir, 'added_dates.json');
 const addedDates = fs.existsSync(addedFile) ? JSON.parse(fs.readFileSync(addedFile, 'utf8')) : {};
 
+// GitHub repos for agentic coding posts (id -> urls), looked up by hand when the post only names the project; links written in the post are found below.
+const reposFile = path.join(dataDir, 'repos.json');
+const repoLinks = fs.existsSync(reposFile) ? JSON.parse(fs.readFileSync(reposFile, 'utf8')) : {};
+const GITHUB = /(?:https?:\/\/)?github\.com\/[\w.-]+\/[\w-]+(?:\.[\w-]+)*/gi;
+const repoKey = (u) => u.replace(/^(https?:\/\/)?/i, 'https://').replace(/\.git$/i, '').replace(/[.)]+$/, '');
+
 const rows = parseCsv('categorized_saved_posts_full.csv');
 const posts = rows.map((r, i) => ({
   id: r.media_id,
@@ -70,6 +76,11 @@ for (const p of posts) {
   const code = shortcode(p.url);
   if (code && uploaded.has(code)) p.video = code;
   p.subcategories = p.subcategories.filter((s) => !parentsOf[s] || parentsOf[s].some((c) => p.categories.includes(c)));
+  if (p.categories.includes('Agentic coding')) {
+    const found = [...(repoLinks[p.id] || []), ...[p.caption, p.transcript, p.imageText].join('\n').matchAll(GITHUB)].map((m) => repoKey(String(m)));
+    const repos = [...new Map(found.map((u) => [u.toLowerCase(), u])).values()];
+    if (repos.length) p.repos = repos;
+  }
 }
 
 const emb = parseCsv('embeddings.csv');
@@ -89,4 +100,4 @@ posts.forEach((p, i) => {
 fs.writeFileSync(path.join(outDir, 'posts.json'), JSON.stringify({ dims, posts }));
 fs.writeFileSync(path.join(outDir, 'embeddings.bin'), Buffer.from(buf.buffer));
 fs.copyFileSync(path.join(dataDir, 'agentic_tips.md'), path.join(outDir, 'agentic_tips.md'));
-console.log(`[build-data] ${posts.length} posts, ${dims} dims, ${missing} missing embeddings, ${posts.filter((p) => p.video).length} self-hosted videos`);
+console.log(`[build-data] ${posts.length} posts, ${dims} dims, ${missing} missing embeddings, ${posts.filter((p) => p.video).length} self-hosted videos, ${posts.filter((p) => p.repos).length} with repo links`);

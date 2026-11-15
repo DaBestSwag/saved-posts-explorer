@@ -78,6 +78,47 @@ function Video({ code, label }: { code: string; label: string }) {
   );
 }
 
+/** A GitHub repo the post shows or names, with a button that copies its link. */
+function RepoLink({ url }: { url: string }) {
+  const [copied, setCopied] = useState<'' | 'ok' | 'fail'>('');
+  const timer = useRef(0);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied('ok');
+    } catch {
+      setCopied('fail');
+    }
+    clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => setCopied(''), 1600);
+  };
+  return (
+    <div className="repo">
+      <a href={url} target="_blank" rel="noopener noreferrer" title={url}>
+        <svg className="repo-icon" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M3 13.5V3a1.5 1.5 0 0 1 1.5-1.5H13v10H4.5A1.5 1.5 0 0 0 3 13a1.5 1.5 0 0 0 1.5 1.5H13" />
+        </svg>
+        {url.replace(/^https:\/\/github\.com\//i, '')}
+      </a>
+      <button className={`repo-copy ${copied}`} onClick={copy} aria-label={copied === 'ok' ? 'Link copied' : 'Copy repo link'} title="Copy link">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          {copied === 'ok' ? (
+            <path d="M3 8.5l3.2 3L13 4.5" />
+          ) : copied === 'fail' ? (
+            <path d="M8 3v6.5M8 12.5v.5" />
+          ) : (
+            <>
+              <rect x="5.5" y="5.5" width="8" height="8" rx="1.5" />
+              <path d="M10.5 3.5V3A1.5 1.5 0 0 0 9 1.5H4A1.5 1.5 0 0 0 2.5 3v5A1.5 1.5 0 0 0 4 9.5h.5" />
+            </>
+          )}
+        </svg>
+      </button>
+    </div>
+  );
+}
+
 export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; index?: number; reason?: string; onAsk?: (p: Post) => void }) {
   const [open, setOpen] = useState(false);
   const long = p.caption.length > 200 || p.caption.split('\n').length > 3;
@@ -154,6 +195,7 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
             ▶ {p.mediaType === 'VIDEO' ? 'Watch here' : 'View here'}
           </button>
         ))}
+      {p.repos?.map((u) => <RepoLink key={u} url={u} />)}
       {p.desc && (
         <details className="desc">
           <summary>In the video</summary>
