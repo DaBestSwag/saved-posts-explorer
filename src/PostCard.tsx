@@ -82,12 +82,20 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
   const [open, setOpen] = useState(false);
   const long = p.caption.length > 200 || p.caption.split('\n').length > 3;
 
-  // Instagram's player loads only on tap: 60 live embeds at once would stall a phone.
   const embedUrl = /^https:\/\/www\.instagram\.com\/(p|reel|tv)\/[\w-]+\/?/.exec(p.url)?.[0].replace(/\/?$/, '/embed/');
-  // Our own videos are cheap (metadata only, paused), so they start open; Instagram embeds still wait for a tap.
+  // Our own videos are cheap (metadata only, paused), so they start open; Instagram embeds open as they scroll into view (below).
   const [embed, setEmbed] = useState(!!p.video);
   const [height, setHeight] = useState(0);
   const frame = useRef<HTMLIFrameElement>(null);
+  const card = useRef<HTMLElement>(null);
+  const dismissed = useRef(false); // set by "Hide player" so it isn't reopened straight away
+  // Embeds open on their own, but only as the card nears the screen, so a page of 60 never loads them all at once.
+  useEffect(() => {
+    if (embed || p.video || !embedUrl || !card.current || dismissed.current) return;
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && setEmbed(true), { rootMargin: '300px' });
+    io.observe(card.current);
+    return () => io.disconnect();
+  }, [embed, p.video, embedUrl]);
   useEffect(() => {
     if (!embed || p.video) return;
     // The embed reports its content height so the card can fit it without a scrollbar.
@@ -105,7 +113,7 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
   }, [embed, p.video]);
 
   return (
-    <article className="card" style={{ '--i': Math.min(index, 12) } as React.CSSProperties}>
+    <article ref={card} className="card" style={{ '--i': Math.min(index, 12) } as React.CSSProperties}>
       {reason && <div className="reason">✨ {reason}</div>}
       <header className="card-head">
         <div className="who">
@@ -139,7 +147,7 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
                 <iframe ref={frame} src={embedUrl} title={`Instagram post by @${p.author}`} allow="autoplay; encrypted-media; picture-in-picture; clipboard-write" allowFullScreen />
               </div>
             )}
-            <button className="link" onClick={() => setEmbed(false)}>Hide player</button>
+            <button className="link" onClick={() => ((dismissed.current = true), setEmbed(false))}>Hide player</button>
           </div>
         ) : (
           <button className="btn watch" onClick={() => setEmbed(true)}>
