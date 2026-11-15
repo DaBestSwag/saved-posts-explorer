@@ -13,7 +13,7 @@ function fmtDate(s: string) {
 
 /** Our own copy of the video: plays in the page everywhere, including posts Instagram's embed refuses (licensed music). */
 function Video({ code, label }: { code: string; label: string }) {
-  // Mounted only when opened, so it picks up the speed last chosen on any card.
+  // Mounted when the card's player is open, so it picks up the speed last chosen on any card.
   const [speed, setSpeed] = useStored<number>('videoSpeed', 1);
   const ref = useRef<HTMLVideoElement>(null);
   // Press-and-hold plays at 2× only while held; the chosen speed is untouched.
@@ -53,7 +53,6 @@ function Video({ code, label }: { code: string; label: string }) {
         className="own-video"
         src={`/v/${code}.mp4`}
         controls
-        autoPlay
         playsInline
         preload="metadata"
         aria-label={label}
@@ -85,7 +84,8 @@ export function PostCard({ post: p, index = 0, reason, onAsk }: { post: Post; in
 
   // Instagram's player loads only on tap: 60 live embeds at once would stall a phone.
   const embedUrl = /^https:\/\/www\.instagram\.com\/(p|reel|tv)\/[\w-]+\/?/.exec(p.url)?.[0].replace(/\/?$/, '/embed/');
-  const [embed, setEmbed] = useState(false);
+  // Our own videos are cheap (metadata only, paused), so they start open; Instagram embeds still wait for a tap.
+  const [embed, setEmbed] = useState(!!p.video);
   const [height, setHeight] = useState(0);
   const frame = useRef<HTMLIFrameElement>(null);
   useEffect(() => {
