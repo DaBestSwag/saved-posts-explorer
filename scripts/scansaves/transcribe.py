@@ -1,3 +1,9 @@
+import sys
+if sys.platform == "darwin":  # Mac: no NVIDIA GPU / faster-whisper there, use transcribe_mac.py (same output)
+    import os, runpy
+    runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "transcribe_mac.py"), run_name="__main__")
+    sys.exit(0)
+
 import glob, json, os, subprocess
 import numpy as np
 from faster_whisper import WhisperModel

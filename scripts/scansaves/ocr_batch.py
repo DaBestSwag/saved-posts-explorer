@@ -1,3 +1,9 @@
+import sys
+if sys.platform == "darwin":  # Mac: no NVIDIA GPU / faster-whisper there, use ocr_batch_mac.py (same output)
+    import os, runpy
+    runpy.run_path(os.path.join(os.path.dirname(os.path.abspath(__file__)), "ocr_batch_mac.py"), run_name="__main__")
+    sys.exit(0)
+
 import glob, os, re, sys
 import torch
 from transformers import AutoModel, AutoTokenizer

@@ -11,3 +11,4 @@ data/videos/
 # scan scratch folder (downloads, transcripts, OCR)
 scan-work/
 new-posts/
+.venv/
